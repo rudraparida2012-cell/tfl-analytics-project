@@ -1,9 +1,9 @@
 # TfL Real-Time Transport Analytics Platform
 
 ## Project Overview
-This project is an end-to-end Azure data engineering platform built using TfL API data. It ingests transport service data, stores it in a cloud lakehouse architecture, transforms it through Bronze, Silver, and Gold layers, models it using dbt, and serves insights through Power BI dashboards.
+This project is an end-to-end Azure data engineering platform built using TfL API data. It ingests transport service data directly into Azure Data Lake Storage Gen2, processes it through a Databricks medallion architecture, models it with dbt, and serves reporting datasets for Power BI.
 
-The project is designed to resemble a production-style data engineering solution rather than a basic portfolio demo.
+The project is designed to resemble a production-style Azure lakehouse solution rather than a simple notebook demo.
 
 ---
 
@@ -11,31 +11,46 @@ The project is designed to resemble a production-style data engineering solution
 Transport operations teams and decision-makers need timely visibility into service health, line disruptions, and status changes across the network.
 
 This project solves that problem by building a near-real-time analytics platform that:
-- ingests TfL API data on a micro-batch basis
-- stores historical snapshots
-- transforms semi-structured API responses into structured Delta tables
-- exposes business-facing reporting datasets
-- enables dashboarding and operational monitoring
+
+- pulls TfL API data on a recurring schedule
+- stores historical raw snapshots in cloud storage
+- transforms semi-structured JSON into structured Delta tables
+- serves business-ready analytical datasets
+- supports orchestration, monitoring, and reporting
 
 ---
 
 ## Project Objective
-Build a production-style lakehouse platform using Azure, Databricks, dbt, and Power BI to support transport status reporting and analytics.
+Build a cloud-orchestrated Azure lakehouse pipeline using TfL API data, Azure Data Lake Storage Gen2, Azure Databricks, dbt, Azure Data Factory, and Power BI.
 
 ---
 
-## Architecture Overview
-The architecture follows a medallion lakehouse pattern:
+## Final End-to-End Architecture
+The final architecture follows a cloud-driven micro-batch lakehouse design:
 
 TfL API  
-→ Python ingestion  
+→ ADF Schedule Trigger (every 15 minutes)  
+→ Databricks ingestion notebook  
 → ADLS Gen2 Raw  
 → Databricks Bronze  
 → Databricks Silver  
 → Databricks Gold  
-→ dbt semantic transformation layer  
-→ Power BI dashboards  
-→ ADF orchestration and monitoring  
+→ dbt semantic layer  
+→ Power BI refresh  
+→ dashboard reporting
+
+---
+
+## Architecture Pattern
+This project uses:
+
+- **processing type:** batch
+- **execution pattern:** micro-batch
+- **load pattern:** incremental raw snapshot ingestion
+- **storage pattern:** medallion architecture
+- **serving pattern:** semantic model + BI reporting
+
+It is not a true streaming architecture because processing is triggered on a schedule, not by a continuously running event stream.
 
 ---
 
@@ -46,59 +61,62 @@ TfL API
 - Delta Lake
 - dbt
 - Azure Data Factory
-- Azure Key Vault
+- Azure Key Vault / Databricks Secret Scope
 - Power BI
-- Databricks Secret Scope
-- Unity Catalog
+- Databricks SQL Warehouse
+- GitHub
+- Databricks Git Folder integration
 
 ---
 
 ## End-to-End Data Flow
-1. TfL API data is extracted using Python
-2. Raw JSON snapshots are landed into ADLS Gen2
-3. Databricks Bronze notebooks ingest raw data into Delta format
-4. Silver notebooks flatten and standardize the data
-5. Gold notebooks create business-facing fact and dimension tables
-6. dbt models formalize sources, staging, intermediate, and marts logic
-7. Power BI consumes Gold/dbt tables for dashboarding
-8. ADF orchestrates Bronze → Silver → Gold execution
 
----
+### 1. Ingestion
+A Databricks notebook pulls data from TfL API endpoints and writes raw JSON snapshots directly into the `raw` ADLS container.
 
-## Medallion Architecture
-
-### Raw Layer
-Raw JSON files landed from TfL APIs into ADLS.
-
-### Bronze Layer
-Minimal transformation from raw JSON into Delta tables with ingestion metadata such as:
-- bronze_loaded_at
-- source_file_name
-- source_system
-- dataset_name
-
-### Silver Layer
-Flattened and standardized datasets for analytics-ready transformation:
+Examples of ingested datasets:
 - line status
 - disruptions
 - routes
-- stop points
+- stoppoints
 - arrivals
 
-### Gold Layer
-Business-facing dimensional and fact tables:
-- `gold_dim_line`
-- `gold_fact_line_status`
-- `gold_kpi_line_status_summary`
+Files are stored as timestamped raw snapshots in ADLS.
 
----
+### 2. Bronze Layer
+The Bronze layer performs minimal transformation from raw JSON into Delta format. It preserves source structure while adding ingestion metadata such as:
 
-## dbt Layer
-dbt was used to structure the semantic transformation layer into:
-- sources
-- staging
-- intermediate
-- marts
+- `source_file_name`
+- `source_system`
+- `dataset_name`
+- `bronze_loaded_at`
+
+### 3. Silver Layer
+The Silver layer standardizes and flattens Bronze data into analytics-ready structures.
+
+For example, line status nested JSON is flattened into structured fields such as:
+- line id
+- line name
+- mode name
+- status severity
+- status description
+- timestamps
+
+### 4. Gold Layer
+The Gold layer creates business-facing marts for analytics and reporting.
+
+Implemented Gold outputs:
+- `dim_line`
+- `fact_line_status`
+- `kpi_line_status_summary`
+
+### 5. dbt Layer
+dbt formalizes the semantic transformation layer and provides:
+- model organization
+- dependency management
+- data testing
+- documentation
+- lineage
 
 Implemented dbt models:
 - `stg_line_status`
@@ -107,76 +125,227 @@ Implemented dbt models:
 - `fact_line_status`
 - `kpi_line_status_summary`
 
-dbt tests were added for:
-- not null
-- unique
-- relationships
+### 6. Power BI
+Power BI consumes the final curated analytical model for dashboarding and KPI reporting.
 
-dbt documentation and lineage were generated successfully.
+---
+
+## Medallion Architecture
+
+### Raw Layer
+Raw JSON snapshots from TfL APIs are written directly into ADLS Gen2.
+
+Purpose:
+- preserve source payloads
+- support replay/reprocessing
+- enable auditability
+- maintain historical snapshots
+
+### Bronze Layer
+Bronze stores raw data in Delta format with minimal transformation.
+
+Purpose:
+- standardize storage format
+- retain original payload
+- append lineage metadata
+
+### Silver Layer
+Silver applies schema standardization, flattening, and cleansing.
+
+Purpose:
+- turn nested API structures into structured analytical records
+- normalize fields for business use
+- prepare for Gold marts
+
+### Gold Layer
+Gold produces reporting-ready dimension, fact, and KPI tables.
+
+Purpose:
+- enable Power BI consumption
+- support semantic modeling
+- provide business-friendly reporting datasets
+
+---
+
+## Implemented Datasets
+
+### Raw / Bronze
+- `line_status`
+- `disruptions`
+- `routes`
+- `stoppoints`
+- `arrivals`
+
+### Silver
+- `line_status`
+
+### Gold
+- `dim_line`
+- `fact_line_status`
+- `kpi_line_status_summary`
+
+### dbt
+- `stg_line_status`
+- `int_line_status`
+- `dim_line`
+- `fact_line_status`
+- `kpi_line_status_summary`
+
+---
+
+## dbt Layer Details
+dbt is used to create a formal semantic layer on top of curated Databricks tables.
+
+### Implemented capabilities
+- source definitions
+- staging models
+- marts models
+- not null tests
+- unique tests
+- relationship tests
+- dbt docs generation
+- lineage graph generation
+
+### dbt execution
+dbt is executed from a Databricks notebook inside the orchestrated pipeline using:
+
+- Git-backed dbt project in Databricks
+- generated `profiles.yml`
+- Databricks SQL Warehouse connection
+- Databricks PAT stored in secret scope
 
 ---
 
 ## Power BI Layer
-Power BI was connected to Databricks SQL Warehouse and used to build a semantic model and dashboard.
 
-Implemented reporting artifacts:
-- Executive Overview page
-- Line Status Monitoring page
-- KPI Summary page
+### Semantic model
+A semantic model was created in Power BI using the final Gold/dbt outputs.
 
-Core Power BI measures:
+### Model entities
+- `dim_line`
+- `fact_line_status`
+- `kpi_line_status_summary`
+
+### Example measures
 - Total Status Records
 - Distinct Lines
-- Minor Delays Count
-- Good Service Count
-- Average Severity
 - Distinct Affected Lines
+- Good Service Count
+- Minor Delays Count
+- Average Severity
+
+### Reporting purpose
+The Power BI layer provides:
+- executive summary reporting
+- operational line status monitoring
+- KPI summaries by severity
 
 ---
 
 ## Orchestration
-Azure Data Factory was used to orchestrate the lakehouse pipeline.
 
-Master pipeline:
+### Master Pipeline
+Pipeline name:
 - `pl_tfl_end_to_end`
 
-Current activities:
+### Final activity flow
+- `nb_ingest_tfl_to_raw`
 - `nb_bronze_ingestion`
 - `nb_silver_transformation`
 - `nb_gold_transformation`
+- `nb_dbt_run`
+- `nb_pbi_refresh`
 
-The pipeline uses success-based dependencies, retry logic, and ADF Monitor for execution tracking.
+### Trigger
+A scheduled ADF trigger runs the pipeline every **15 minutes**.
+
+### Dependency logic
+Each step runs only after the previous one succeeds.
+
+Flow:
+- ingestion → bronze → silver → gold → dbt → Power BI refresh
+
+### Retry logic
+Notebook activities are configured with:
+- retry count: 1
+- retry interval: 60 seconds
 
 ---
 
 ## Monitoring and Logging
-Monitoring was implemented through:
-- ADF Monitor for activity-level pipeline execution
-- Databricks notebook logs for row counts, source paths, and target paths
-- validation checks to prevent zero-row outputs
 
-Validation examples:
+### ADF monitoring
+ADF Monitor is used to track:
+- pipeline run status
+- trigger run status
+- activity run status
+- execution duration
+- start and end timestamps
+- failure messages
+
+### Notebook logging
+Databricks notebooks log:
+- dataset name
+- source path
+- target path
+- input row counts
+- output row counts
+- completion status
+
+### Validation rules
+Basic validation checks are included, such as:
 - Bronze row count > 0
 - Silver row count > 0
 - Gold row count > 0
 
+If a critical transformation produces zero rows, the notebook raises an error and the pipeline stops.
+
+---
+
+## Security and Secrets
+Secrets are managed using Databricks secret scope / Azure Key Vault integration.
+
+Examples of managed secrets:
+- ADLS storage key
+- TfL API key
+- Databricks PAT
+- Power BI credentials
+
+No secrets or tokens are stored directly in source control.
+
+---
+
+## Git Integration
+The project repository is stored in GitHub and cloned into Databricks using a Git folder.
+
+This enables:
+- version control
+- dbt project execution from Databricks
+- easier project packaging and collaboration
+
 ---
 
 ## Project Structure
+
 ```text
 tfl-analytics-project/
 │
-├── ingestion/
-├── databricks/
-├── dbt/
-├── docs/
-├── config/
-├── tests/
 ├── data/
+│   └── raw/
+├── dbt/
+│   ├── models/
+│   ├── macros/
+│   ├── tests/
+│   ├── dbt_project.yml
+│   └── packages.yml
+├── docs/
+│   ├── data_model_inventory.md
+│   ├── monitoring_and_logging.md
+│   ├── orchestration_flow.md
+│   ├── cv_project_summary.md
+│   ├── linkedin_project_summary.md
+│   └── interview_project_pitch.md
+├── ingestion/
 ├── README.md
 ├── requirements.txt
-├── .env
 └── .gitignore
-# tfl-analytics-project
-# tfl-analytics-project
-# tfl-analytics-project

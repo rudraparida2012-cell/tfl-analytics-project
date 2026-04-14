@@ -1,0 +1,56 @@
+version: 2
+
+models:
+  - name: dim_line
+    description: "Dimension table for TfL lines"
+    columns:
+      - name: line_id
+        description: "Unique identifier for the line"
+        tests:
+          - not_null
+          - unique
+
+      - name: line_name
+        description: "Human-readable line name"
+        tests:
+          - not_null
+
+      - name: mode_name
+        description: "Transport mode"
+
+  - name: fact_line_status
+    description: "Fact table containing line status records"
+    columns:
+      - name: line_id
+        description: "Foreign key to dim_line"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_line')
+              field: line_id
+
+      - name: line_status_id
+        description: "Identifier for line status record"
+
+      - name: status_severity
+        description: "Numeric status severity"
+        tests:
+          - not_null
+
+      - name: status_severity_description
+        description: "Severity description"
+
+  - name: kpi_line_status_summary
+    description: "Aggregated KPI summary for line status"
+    columns:
+      - name: status_severity
+        description: "Numeric status severity"
+
+      - name: status_severity_description
+        description: "Severity description"
+
+      - name: status_record_count
+        description: "Count of status records"
+
+      - name: distinct_line_count
+        description: "Count of distinct lines"

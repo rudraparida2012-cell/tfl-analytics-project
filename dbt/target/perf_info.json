@@ -1,0 +1,57 @@
+{
+    "path_count": 203,
+    "parsed_path_count": 203,
+    "static_analysis_path_count": 5,
+    "static_analysis_parsed_path_count": 5,
+    "is_partial_parse_enabled": true,
+    "is_static_analysis_enabled": true,
+    "read_files_elapsed": 0.03993795900000041,
+    "load_macros_elapsed": 0.8366730420000001,
+    "parse_project_elapsed": 0.21951604199999997,
+    "patch_sources_elapsed": 0.014361624999999822,
+    "process_manifest_elapsed": 0.02940612499999995,
+    "load_all_elapsed": 1.2028587500000003,
+    "projects": [
+        {
+            "project_name": "tfl_analytics",
+            "elapsed": 0.20591508300000028,
+            "parsers": [
+                {
+                    "parser": "model",
+                    "elapsed": 0.14167179100000027,
+                    "parsed_path_count": 5
+                },
+                {
+                    "parser": "test",
+                    "elapsed": 0.05998745800000016,
+                    "parsed_path_count": 1
+                }
+            ],
+            "parsed_path_count": 6
+        },
+        {
+            "project_name": "dbt_databricks",
+            "elapsed": 0.004764291000000309,
+            "parsers": [],
+            "parsed_path_count": 0
+        },
+        {
+            "project_name": "dbt_spark",
+            "elapsed": 0.004098291000000032,
+            "parsers": [],
+            "parsed_path_count": 0
+        },
+        {
+            "project_name": "dbt",
+            "elapsed": 0.004656708999999815,
+            "parsers": [
+                {
+                    "parser": "doc",
+                    "elapsed": 0.0001721249999997454,
+                    "parsed_path_count": 1
+                }
+            ],
+            "parsed_path_count": 1
+        }
+    ]
+}

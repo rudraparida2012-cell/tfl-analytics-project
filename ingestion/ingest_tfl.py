@@ -75,6 +75,10 @@ def ingest_stoppoints():
     if data is not None:
         save_json(data, "stoppoints", "tube_stoppoints")
 
+def ingest_arrivals():
+    data = call_tfl_api("/Line/victoria/Arrivals/940GZZLUVIC")
+    if data is not None:
+        save_json(data, "arrivals", "victoria_victoria_station_arrivals")
 
 def main():
     if not TFL_APP_KEY:
@@ -85,6 +89,7 @@ def main():
     ingest_disruptions()
     ingest_routes()
     ingest_stoppoints()
+    ingest_arrivals()
     print("TfL ingestion completed.")
 
 

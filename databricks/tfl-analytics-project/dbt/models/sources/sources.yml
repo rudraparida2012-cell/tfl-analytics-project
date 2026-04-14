@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: silver
+    database: rudxdatabricks
+    schema: default
+    tables:
+      - name: line_status
+        description: "Flattened and standardized line status dataset exposed as a Databricks view"
+        columns:
+          - name: line_id
+            description: "Unique identifier of the TfL line"
+          - name: line_name
+            description: "Human-readable name of the TfL line"
+          - name: mode_name
+            description: "Transport mode"
+          - name: line_status_id
+            description: "Identifier of the line status record"
+          - name: status_line_id
+            description: "Line identifier inside the nested status payload"
+          - name: status_severity
+            description: "Numeric severity of the line status"
+          - name: status_severity_description
+            description: "Human-readable severity description"
+          - name: status_reason
+            description: "Reason text for the status"

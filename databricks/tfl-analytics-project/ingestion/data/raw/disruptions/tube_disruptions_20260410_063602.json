@@ -1,0 +1,52 @@
+[
+  {
+    "$type": "Tfl.Api.Presentation.Entities.Disruption, Tfl.Api.Presentation.Entities",
+    "category": "RealTime",
+    "type": "routeInfo",
+    "categoryDescription": "RealTime",
+    "description": "District Line: Minor delays between Earl's Court and Wimbledon while we fix a points failure at Wimbledon. GOOD SERVICE on the rest of the line. ",
+    "affectedRoutes": [],
+    "affectedStops": [],
+    "closureText": "minorDelays"
+  },
+  {
+    "$type": "Tfl.Api.Presentation.Entities.Disruption, Tfl.Api.Presentation.Entities",
+    "category": "RealTime",
+    "type": "routeInfo",
+    "categoryDescription": "RealTime",
+    "description": "Piccadilly Line: Minor delays between Acton Town and Uxbridge and between Arnos Grove and Cockfosters following a late finish of engineering work. GOOD SERVICE on the rest of the line. \r\n\r\n\r\n\r\n ",
+    "affectedRoutes": [],
+    "affectedStops": [],
+    "closureText": "minorDelays"
+  },
+  {
+    "$type": "Tfl.Api.Presentation.Entities.Disruption, Tfl.Api.Presentation.Entities",
+    "category": "RealTime",
+    "type": "routeInfo",
+    "categoryDescription": "RealTime",
+    "description": "Piccadilly Line: Minor delays between Acton Town and Uxbridge and between Arnos Grove and Cockfosters following a late finish of engineering work. GOOD SERVICE on the rest of the line. \r\n\r\n\r\n\r\n ",
+    "affectedRoutes": [],
+    "affectedStops": [],
+    "closureText": "minorDelays"
+  },
+  {
+    "$type": "Tfl.Api.Presentation.Entities.Disruption, Tfl.Api.Presentation.Entities",
+    "category": "RealTime",
+    "type": "lineInfo",
+    "categoryDescription": "RealTime",
+    "description": "Metropolitan Line: Minor delays due to train cancellations. ",
+    "affectedRoutes": [],
+    "affectedStops": [],
+    "closureText": "minorDelays"
+  },
+  {
+    "$type": "Tfl.Api.Presentation.Entities.Disruption, Tfl.Api.Presentation.Entities",
+    "category": "RealTime",
+    "type": "lineInfo",
+    "categoryDescription": "RealTime",
+    "description": "Bakerloo Line: Minor delays due to an earlier signal failure at Wembley Central  ",
+    "affectedRoutes": [],
+    "affectedStops": [],
+    "closureText": "minorDelays"
+  }
+]
